@@ -7,9 +7,6 @@ const peer = ref<Peer | null>(null)
 const userId = ref('')
 const conn: Ref<DataConnection | null> = ref(null)
 const callee: Ref<string | null> = ref('')
-const resp = computed(() => {
-  return store.testResponse
-})
 const localStream = ref()
 const remoteStream = ref()
 const id = computed(() => {
@@ -39,9 +36,10 @@ onBeforeMount(() => {
   })
 })
 onMounted(async () => {
+  console.log(import.meta.env.VITE_API_URL)
   getLocalStream()
 })
-const textSpanContainsPosition = () => {}
+
 function getLocalStream() {
   navigator.mediaDevices
     .getUserMedia({ video: false, audio: true })
@@ -64,6 +62,7 @@ function connectPeers() {
   conn.value = peer.value!.connect(callee.value!)
 }
 const call = () => {
+  store.callApi()
   getStreamCode()
   connectPeers()
   const call = peer.value!.call(callee.value!, localStream.value) // A

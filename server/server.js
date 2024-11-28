@@ -21,11 +21,30 @@ const peerServer = ExpressPeerServer(server, {
   path: '/server',
   ssl: {},
 });
+
+// Listen for incoming connections
+io.on('connection', (socket) => {
+  // Log when a user connects
+  console.log('A user connected');
+
+  // Listen for disconnection event
+  socket.on('disconnect', () => {
+    // Log when a user disconnects
+    console.log('User disconnected');
+  });
+
+  // Listen for 'signal' event from a client
+  socket.on('signal', (data) => {
+    // Broadcast the 'signal' event and data to all connected clients except the sender
+    socket.broadcast.emit('signal', data);
+  });
+});
+
 app.use(cors());
 
 app.use(peerServer);
-app.get('/', (req, res) => {
-  res.send('server running!');
+app.get('/api/room', (req, res) => {
+  res.send('rooom!');
 });
 
 server.listen(PORT, () => console.log(`Listening on: ${PORT}`));
