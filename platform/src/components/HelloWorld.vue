@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useCounterStore } from '@/stores/counter'
+import { usePeerStore } from '@/stores/peer'
 import Peer, { DataConnection } from 'peerjs'
+import { socket } from "@/services/socket";
 import { computed, onBeforeMount, onMounted, ref, type Ref } from 'vue'
-const store = useCounterStore()
+const store = usePeerStore()
 const peer = ref<Peer | null>(null)
 const userId = ref('')
 const conn: Ref<DataConnection | null> = ref(null)
@@ -61,6 +62,12 @@ const getStreamCode = () => {
 function connectPeers() {
   conn.value = peer.value!.connect(callee.value!)
 }
+function socketConnect() {
+  socket.connect();
+}
+function socketDIsConnect() {
+  socket.emit('signal', 'essssssssssssssssssssssssssssssa')
+}
 const call = () => {
   store.callApi()
   getStreamCode()
@@ -86,6 +93,8 @@ const call = () => {
     <div id="local-audio"></div>
     <div id="remote-audio"></div>
   </div>
+  <button @click="socketConnect">socket</button>
+  <button @click="socketDIsConnect">socket rozlacz</button>
   <button @click="call">ZADZWON :></button>
 </template>
 

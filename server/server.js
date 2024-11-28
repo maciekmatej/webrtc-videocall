@@ -2,12 +2,25 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const cors = require('cors');
-const { ExpressPeerServer } = require('peer');
+const { PeerServer, ExpressPeerServer } = require('peer');
 const socket = require('socket.io');
 const app = express();
 
 const server = http.createServer(app);
-const PORT = process.env.PORT || 9000;
+const PORT = process.env.PORT || 5000;
+
+//peer server
+const peerPort = process.env.PEER_PORT || 9000;
+const peerServer = PeerServer({
+  port: peerPort,
+  path: '/server',
+  ssl: {},
+  debug: true,
+});
+const expressPeerServer = ExpressPeerServer(peerServer);
+
+app.use(expressPeerServer);
+
 const io = socket(server, {
   cors: {
     origin: '*',
@@ -15,17 +28,10 @@ const io = socket(server, {
   },
 });
 
-const peerServer = ExpressPeerServer(server, {
-  proxied: true,
-  debug: true,
-  path: '/server',
-  ssl: {},
-});
-
 // Listen for incoming connections
 io.on('connection', (socket) => {
   // Log when a user connects
-  console.log('A user connected');
+  console.log('A user connected', socket.id);
 
   // Listen for disconnection event
   socket.on('disconnect', () => {
@@ -42,7 +48,6 @@ io.on('connection', (socket) => {
 
 app.use(cors());
 
-app.use(peerServer);
 app.get('/api/room', (req, res) => {
   res.send('rooom!');
 });
