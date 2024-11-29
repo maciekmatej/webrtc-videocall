@@ -13,12 +13,13 @@ const PORT = process.env.PORT || 5000;
 const peerPort = process.env.PEER_PORT || 9000;
 const peerServer = PeerServer({
   port: peerPort,
-  path: '/server',
+  proxied: true,
+  path: '/',
   ssl: {},
   debug: true,
 });
+// nie mam pojecia dlaczego tak ale dziala ...
 const expressPeerServer = ExpressPeerServer(peerServer);
-
 app.use(expressPeerServer);
 
 const io = socket(server, {
