@@ -8,7 +8,6 @@ import {
   AlertDialogPortal,
   AlertDialogRoot,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from 'radix-vue'
 import { type ModelRef } from 'vue'
 const model: ModelRef<boolean | undefined> = defineModel()

@@ -1,20 +1,29 @@
 {
   "name": "webrtc-server",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "/server.ts",
   "scripts": {
-    "devStart": "nodemon server.js"
+    "devStart": "npx tsx watch ./src/server.ts",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.6",
     "express": "^4.21.1",
     "peer": "^1.0.2",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7"
+    "@tsconfig/node22": "^22.0.0",
+    "@types/node": "^22.10.1",
+    "@types/uuid": "^10.0.0",
+    "eslint": "^9.16.0",
+    "eslint-plugin-node": "^11.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
   }
 }
