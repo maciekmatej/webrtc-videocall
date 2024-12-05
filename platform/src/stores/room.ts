@@ -1,12 +1,17 @@
-import { ref, type Ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import API from '../config/axios'
+import { usePeer } from '@/composables/peer'
 
 export const useRoomStore = defineStore('room', () => {
-  const userList: Ref<string[]> = ref([])
+  const { peer } = usePeer()
+  const participantsList: Ref<string[]> = ref([])
+  const participantsListWithoutUser = computed(() =>
+    participantsList.value.filter((p) => p !== peer.value?.id),
+  )
   const fetchRoomParticipants = async () => {
     try {
-      userList.value = await API.get('/room/userList')
+      participantsList.value = await API.get('/room/userList')
     } catch (error) {
       console.log(error)
     }
@@ -14,5 +19,5 @@ export const useRoomStore = defineStore('room', () => {
   if (import.meta.hot) {
     import.meta.hot.accept(acceptHMRUpdate(useRoomStore, import.meta.hot))
   }
-  return { userList, fetchRoomParticipants }
+  return { participantsList, participantsListWithoutUser, fetchRoomParticipants }
 })

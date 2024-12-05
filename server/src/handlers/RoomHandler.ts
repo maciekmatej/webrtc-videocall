@@ -19,11 +19,23 @@ const roomHandler = (socket: Socket, io: Server) => {
       rooms[roomId].push(peerId);
       socket.join(roomId);
     }
-    io.in(roomId).emit('joined-room', { peerId });
+    socket.on('ready', () => {
+      socket.to(roomId).emit('user-joined-room', { peerId });
+    });
+    socket.on('disconnect', () => leaveRoom({ roomId, peerId }));
+    io.in(roomId).emit('get-users', { roomId, users: rooms[roomId] });
+  };
+  const leaveRoom = ({ roomId, peerId }: IRoomParams) => {
+    if (rooms[roomId]) {
+      rooms[roomId] = rooms[roomId].filter((peer) => peer !== peerId);
+    }
+    socket.leave(roomId);
+    io.in(roomId).emit('user-left-room', { peerId });
     io.in(roomId).emit('get-users', { roomId, users: rooms[roomId] });
   };
   socket.on('create-room', createRoom);
   socket.on('join-room', joinRoom);
+  socket.on('leave-room', leaveRoom);
 };
 
 export default roomHandler;

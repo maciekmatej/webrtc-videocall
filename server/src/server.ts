@@ -22,7 +22,12 @@ const peerServer = PeerServer({
 //@ts-expect-error
 const expressPeerServer = ExpressPeerServer(peerServer);
 app.use(expressPeerServer);
-
+// peerServer.on('connection', function (client) {
+//   console.log(client.);
+// });
+// peerServer.on('disconnect', function (client) {
+//   console.log(client.getId() + 'deconnected');
+// });
 const io = new Server(server, {
   cors: {
     origin: '*',
@@ -37,10 +42,6 @@ io.on('connection', (socket: Socket) => {
   roomHandler(socket, io); //pass socket for room creation
 
   // Listen for disconnection event
-  socket.on('disconnect', () => {
-    // Log when a user disconnects
-    console.log('User disconnected');
-  });
 
   // Listen for 'signal' event from a client
   socket.on('signal', (data) => {

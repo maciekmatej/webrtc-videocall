@@ -1,33 +1,80 @@
 <template>
-  <video ref="videoElRef" :src="src" autoplay></video>
+  <div class="relative">
+    <video
+      ref="videoElRef"
+      class="border-zinc-400 border-2 rounded-md"
+      :style="{ width: '100%', height: 'auto' }"
+      :muted="isLocalFeed"
+      autoplay
+    ></video>
+    <div class="absolute bottom-0">
+      <Button @click="toggleMute('audio')">
+        <template v-if="isAudioMuted">
+          <IconMicOff />
+        </template>
+        <template v-else>
+          <IconMicOn />
+        </template>
+      </Button>
+      <div v-if="isLocalFeed">
+        <Button @click="toggleMute('video')">
+          <template v-if="isVideoMuted">
+            <IconCamOff />
+          </template>
+          <template v-else>
+            <IconCamOn />
+          </template>
+        </Button>
+        <Button @click="toggleEnd()">
+          <template>
+            <IconCamOff />
+          </template>
+        </Button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { ref, watchEffect } from 'vue'
+import Button from './ui/button/Button.vue'
+import IconCamOff from './icons/IconCamOff.vue'
+import IconCamOn from './icons/IconCamOn.vue'
+import IconMicOff from './icons/IconMicOff.vue'
+import IconMicOn from './icons/IconMicOn.vue'
+const props = defineProps<{
+  stream?: MediaStream
+  isLocalFeed: boolean
+}>()
 const videoElRef = ref<HTMLVideoElement>()
-onMounted( async() => {
+const isAudioMuted = ref(true)
+const isVideoMuted = ref(true)
 
-console.log(videoElRef.value);
-    await navigator.mediaDevices
-      .getUserMedia({constraints.value})
-      .then((stream) => {
-        localStream.value = stream // A
-        videoElRef.value!.srcObject = stream // B
-        audioElement.autoplay = true // C
-        audioElement.muted = true // C
-        const localStreamContainer = document.querySelector('#local-audio')
-        localStreamContainer?.append(audioElement)
-      })
-      .catch((err) => {
-        console.error(`you got an error: ${err}`)
-      })
-  }
-)
-watch(videoElRef, () => {
-  if (videoElRef.value) {
-
+watchEffect(() => {
+  if (videoElRef.value && props.stream) {
+    videoElRef.value.srcObject = props.stream
+    isAudioMuted.value = props.stream.getAudioTracks()[0]?.enabled ? false : true
+    isVideoMuted.value = props.stream.getVideoTracks()[0]?.enabled ? false : true
   }
 })
+
+const toggleMute = (type: 'audio' | 'video') => {
+  if (props.stream) {
+    switch (type) {
+      case 'audio':
+        props.stream.getAudioTracks()[0].enabled = isAudioMuted.value
+        isAudioMuted.value = !isAudioMuted.value
+        break
+      case 'video':
+        props.stream.getVideoTracks()[0].enabled = isVideoMuted.value
+        isVideoMuted.value = !isVideoMuted.value
+        break
+
+      default:
+        break
+    }
+  }
+}
 </script>
 
 <style scoped></style>
