@@ -57,6 +57,7 @@ const port = serverConfig.PORT as number;
 const server = http.createServer(app);
 
 const io = new Server(server, {
+  path: '/socket.io/',
   cors: {
     origin: '*',
     methods: ['GET', 'POST'],
