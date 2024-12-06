@@ -9,14 +9,16 @@ import { ExpressPeerServer, PeerServer } from 'peer';
 import { Server, Socket } from 'socket.io';
 import roomHandler from './handlers/RoomHandler.js';
 const app = express();
-
+const peerApp = express();
 const __dirname = path.resolve('../platform/dist');
 
 // peer server old and working
 
+const httpsServer = https.createServer(peerApp).listen(443);
 const peerPort = serverConfig.PEER_PORT as number;
 const peerServer = PeerServer({
-  port: peerPort,
+  port: 443,
+
   path: '/peer',
   // ssl: {},
 });
