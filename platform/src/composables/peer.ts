@@ -7,10 +7,9 @@ const peer = ref<PeerType | null>(null)
 export const usePeer = () => {
   const createNewPeer = () => {
     peer.value = new Peer(UUIDv4(), {
-      port: 443,
-      host: 'localhost',
+      port: 9000,
+      host: 'webrtc-videocall-p7ji.onrender.com',
       debug: 3,
-      secure: true,
       path: '/peer',
       config: {
         iceServers: [
