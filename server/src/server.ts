@@ -14,17 +14,17 @@ const __dirname = path.resolve('../platform/dist');
 
 // peer server old and working
 
-// const httpsServer = https.createServer(peerApp).listen(443);
+const httpsServer = https.createServer(peerApp).listen(443);
 const peerPort = serverConfig.PEER_PORT as number;
-const peerServer = PeerServer({
-  port: 443,
+// const peerServer = PeerServer({
+//   port: 443,
 
-  path: '/peer',
-  // ssl: {},
-});
+//   path: '/peer',
+//   // ssl: {},
+// });
 
-// const expressPeerServer = ExpressPeerServer(peerServer);
-// app.use(expressPeerServer);
+const expressPeerServer = ExpressPeerServer(httpsServer);
+app.use('/peer', expressPeerServer);
 //
 
 //peer server
