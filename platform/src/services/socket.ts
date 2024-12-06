@@ -11,7 +11,7 @@ export const state: Ref<{
 })
 
 // "undefined" means the URL will be computed from the `window.location` object
-const URL = process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:5000'
+// const URL = process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:5000'
 
 export const socket = io({ path: '/socket.io/' })
 socket.on('connect', () => {
