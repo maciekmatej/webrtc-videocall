@@ -14,7 +14,7 @@ const __dirname = path.resolve('../platform/dist');
 
 // peer server old and working
 
-const httpsServer = https.createServer(peerApp).listen(443);
+// const httpsServer = https.createServer(peerApp).listen(443);
 const peerPort = serverConfig.PEER_PORT as number;
 const peerServer = PeerServer({
   port: 443,
