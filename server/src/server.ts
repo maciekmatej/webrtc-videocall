@@ -5,7 +5,7 @@ import https from 'https';
 import path from 'path';
 import cors from 'cors';
 import history from 'connect-history-api-fallback';
-import { ExpressPeerServer } from 'peer';
+import { ExpressPeerServer, PeerServer } from 'peer';
 import { Server, Socket } from 'socket.io';
 import roomHandler from './handlers/RoomHandler.js';
 const app = express();
@@ -14,34 +14,33 @@ const __dirname = path.resolve('../platform/dist');
 
 // peer server old and working
 
-// const peerPort = serverConfig.PEER_PORT as number;
-// const peerServer = PeerServer({
-//   port: peerPort,
-//   proxied: true,
-//   path: '/peer',
-//   // ssl: {},
-// });
+const peerPort = serverConfig.PEER_PORT as number;
+const peerServer = PeerServer({
+  port: peerPort,
+  path: '/peer',
+  // ssl: {},
+});
 
 // const expressPeerServer = ExpressPeerServer(peerServer);
 // app.use(expressPeerServer);
 //
 
 //peer server
-const peerPort = serverConfig.PEER_PORT as number;
-const peerServer = http.createServer(app).listen(9000);
-const expressPeerServer = ExpressPeerServer(peerServer, {
-  //@ts-expect-error
-  debug: true,
-  port: 9000,
-  path: '/peer',
-});
-expressPeerServer.on('connection', function (client) {
-  console.log(client.getId() + ' peer connected');
-});
-expressPeerServer.on('disconnect', function (client) {
-  console.log(client.getId() + ' peer disconnected');
-});
-app.use(expressPeerServer);
+
+// const peerServer = http.createServer(app).listen(9000);
+// const expressPeerServer = ExpressPeerServer(peerServer, {
+//   //@ts-expect-error
+//   debug: true,
+//   port: 9000,
+//   path: '/peer',
+// });
+// expressPeerServer.on('connection', function (client) {
+//   console.log(client.getId() + ' peer connected');
+// });
+// expressPeerServer.on('disconnect', function (client) {
+//   console.log(client.getId() + ' peer disconnected');
+// });
+// app.use(expressPeerServer);
 
 //prevent vue routs from being resolved in express
 app.use(
