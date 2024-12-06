@@ -3,31 +3,59 @@ import serverConfig from './config/serverConfig.js';
 import http from 'http';
 import path from 'path';
 import cors from 'cors';
-import { PeerServer, ExpressPeerServer } from 'peer';
+import history from 'connect-history-api-fallback';
+import { ExpressPeerServer } from 'peer';
 import { Server, Socket } from 'socket.io';
 import roomHandler from './handlers/RoomHandler.js';
 const app = express();
 
-const server = http.createServer(app);
+const __dirname = path.resolve('../platform/dist');
+
+// peer server old and working
+
+// const peerPort = serverConfig.PEER_PORT as number;
+// const peerServer = PeerServer({
+//   port: peerPort,
+//   proxied: true,
+//   path: '/peer',
+//   // ssl: {},
+// });
+
+// const expressPeerServer = ExpressPeerServer(peerServer);
+// app.use(expressPeerServer);
+//
 
 //peer server
 const peerPort = serverConfig.PEER_PORT as number;
-const peerServer = PeerServer({
-  port: peerPort,
-  proxied: true,
-  path: '/',
-  // ssl: {},
+const peerServer = http.createServer(app);
+const expressPeerServer = ExpressPeerServer(peerServer, {});
+expressPeerServer.on('connection', function (client) {
+  console.log(client.getId() + ' peer connected');
 });
-// nie mam pojecia dlaczego tak ale dziala ...
-//@ts-expect-error
-const expressPeerServer = ExpressPeerServer(peerServer);
-app.use(expressPeerServer);
-// peerServer.on('connection', function (client) {
-//   console.log(client.);
-// });
-// peerServer.on('disconnect', function (client) {
-//   console.log(client.getId() + 'deconnected');
-// });
+expressPeerServer.on('disconnect', function (client) {
+  console.log(client.getId() + ' peer disconnected');
+});
+app.use('/peer', expressPeerServer);
+
+//prevent vue routs from being resolved in express
+app.use(
+  history({
+    rewrites: [
+      {
+        from: /^\/api\/.*$/,
+        //@ts-expect-error
+        to: function (context) {
+          return context.parsedUrl.path;
+        },
+      },
+    ],
+  })
+);
+
+// server for backend and socket
+const port = serverConfig.PORT as number;
+const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
     origin: '*',
@@ -40,22 +68,13 @@ io.on('connection', (socket: Socket) => {
   // Log when a user connects
   console.log('A user connected', socket.id);
   roomHandler(socket, io); //pass socket for room creation
-
-  // Listen for disconnection event
-
-  // Listen for 'signal' event from a client
-  socket.on('signal', (data) => {
-    // Broadcast the 'signal' event and data to all connected clients except the sender
-    socket.broadcast.emit('signal', data);
-  });
 });
-
 app.use(cors());
+app.use(express.static(__dirname));
 
-app.get('/api/room', (req: Request, res: Response) => {
-  res.send('rooom!');
+app.get('/api/*', (req: Request, res: Response) => {
+  res.send('API connected');
 });
 
-server.listen(serverConfig.PORT, () =>
-  console.log(`Listening on: ${serverConfig.PORT}`)
-);
+server.listen(port, () => console.log(`Listening on: ${port}`));
+peerServer.listen(peerPort, () => console.log(`Listening on: ${peerPort}`));

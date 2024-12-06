@@ -10,7 +10,7 @@ export const usePeer = () => {
       port: 9000,
       host: location.hostname,
       debug: 1,
-      path: '/',
+      path: '/peer',
       config: {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },

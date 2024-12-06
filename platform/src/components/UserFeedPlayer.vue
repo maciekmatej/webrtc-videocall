@@ -25,9 +25,9 @@
             <IconCamOn />
           </template>
         </Button>
-        <Button @click="toggleEnd()">
+        <Button @click="hangupCall">
           <template>
-            <IconCamOff />
+            <IconHangup />
           </template>
         </Button>
       </div>
@@ -42,6 +42,7 @@ import IconCamOff from './icons/IconCamOff.vue'
 import IconCamOn from './icons/IconCamOn.vue'
 import IconMicOff from './icons/IconMicOff.vue'
 import IconMicOn from './icons/IconMicOn.vue'
+import IconHangup from './icons/IconHangup.vue'
 const props = defineProps<{
   stream?: MediaStream
   isLocalFeed: boolean
@@ -58,6 +59,9 @@ watchEffect(() => {
   }
 })
 
+const hangupCall = () => {
+  console.log('hangup')
+}
 const toggleMute = (type: 'audio' | 'video') => {
   if (props.stream) {
     switch (type) {

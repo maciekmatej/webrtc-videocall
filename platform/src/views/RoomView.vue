@@ -60,7 +60,7 @@ async function getLocalStream() {
 // }
 // const callPeer = (user: string) => {
 //   connectPeers(user)
-//   //@ts-expect-error option has a wrond type;
+
 //   const call = peer.value!.call(user, localStream.value, options) // A
 //   call.on('stream', (stream) => {
 //     addRemoteStream(stream, user)
@@ -105,13 +105,6 @@ watchEffect(() => {
     })
   })
   socket.on('user-left-room', ({ peerId }: { peerId: string }) => {
-    //@ts-expect-error wrong type for peerjs otption
-    // console.log('call new peer that joined the room', peerId)
-    // call.on('stream', (stream) => {
-    //   if (!remoteStreams.value[peerId]) {
-    //     return
-    //   }
-    // })
     removeRemoteFeed(peerId)
   })
 
