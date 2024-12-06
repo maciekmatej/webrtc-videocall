@@ -32,6 +32,7 @@ const peerServer = https.createServer(app).listen(443);
 const expressPeerServer = ExpressPeerServer(peerServer, {
   //@ts-expect-error
   debug: true,
+  port: 443,
   path: '/peer',
 });
 expressPeerServer.on('connection', function (client) {
