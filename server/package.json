@@ -8,7 +8,7 @@
     "clean": "rm -rf dist rm -rf tsconfig.tsbuildinfo"
   },
   "engines": {
-    "node": "22.10.1"
+    "node": "22.11.0"
   },
   "author": "",
   "license": "ISC",
