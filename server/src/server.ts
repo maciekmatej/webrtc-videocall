@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import serverConfig from './config/serverConfig.js';
 import http from 'http';
+import https from 'https';
 import path from 'path';
 import cors from 'cors';
 import history from 'connect-history-api-fallback';
@@ -27,7 +28,7 @@ const __dirname = path.resolve('../platform/dist');
 
 //peer server
 const peerPort = serverConfig.PEER_PORT as number;
-const peerServer = app.listen(9000);
+const peerServer = https.createServer(app).listen(443);
 const expressPeerServer = ExpressPeerServer(peerServer, {
   //@ts-expect-error
   debug: true,
