@@ -8,7 +8,7 @@ export const usePeer = () => {
   const createNewPeer = () => {
     peer.value = new Peer(UUIDv4(), {
       port: 9000,
-      host: location.hostname,
+      host: 'webrtc-videocall-p7ji.onrender.com',
       debug: 1,
       path: '/peer',
       config: {

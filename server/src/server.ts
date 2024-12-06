@@ -28,7 +28,11 @@ const __dirname = path.resolve('../platform/dist');
 //peer server
 const peerPort = serverConfig.PEER_PORT as number;
 const peerServer = http.createServer(app);
-const expressPeerServer = ExpressPeerServer(peerServer, {});
+const expressPeerServer = ExpressPeerServer(peerServer, {
+  //@ts-expect-error
+  debug: true,
+  path: '/peer',
+});
 expressPeerServer.on('connection', function (client) {
   console.log(client.getId() + ' peer connected');
 });
