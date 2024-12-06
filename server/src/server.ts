@@ -43,9 +43,8 @@ app.use(
     rewrites: [
       {
         from: /^\/api\/.*$/,
-        //@ts-expect-error blad
         to: function (context) {
-          return context.parsedUrl.path;
+          return context.parsedUrl.path as string;
         },
       },
     ],
