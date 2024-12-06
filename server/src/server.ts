@@ -27,7 +27,7 @@ const __dirname = path.resolve('../platform/dist');
 
 //peer server
 const peerPort = serverConfig.PEER_PORT as number;
-const peerServer = http.createServer(app);
+const peerServer = app.listen(9000);
 const expressPeerServer = ExpressPeerServer(peerServer, {
   //@ts-expect-error
   debug: true,
@@ -39,7 +39,7 @@ expressPeerServer.on('connection', function (client) {
 expressPeerServer.on('disconnect', function (client) {
   console.log(client.getId() + ' peer disconnected');
 });
-app.use('/peer', expressPeerServer);
+app.use(expressPeerServer);
 
 //prevent vue routs from being resolved in express
 app.use(
@@ -81,4 +81,4 @@ app.get('/api/*', (req: Request, res: Response) => {
 });
 
 server.listen(port, () => console.log(`Listening on: ${port}`));
-peerServer.listen(peerPort, () => console.log(`Listening on: ${peerPort}`));
+// peerServer.listen(peerPort, () => console.log(`Listening on: ${peerPort}`));
