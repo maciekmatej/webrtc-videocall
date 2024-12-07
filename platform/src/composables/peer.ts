@@ -5,12 +5,12 @@ import { ref } from 'vue'
 const peer = ref<PeerType | null>(null)
 
 export const usePeer = () => {
+  console.log(location.hostname, 'hostname')
   const createNewPeer = () => {
     peer.value = new Peer(UUIDv4(), {
-      port: 443,
-      host: 'webrtc-videocall-p7ji.onrender.com',
+      port: 9000,
+      host: location.hostname,
       debug: 3,
-      secure: true,
       path: '/peer',
       config: {
         iceServers: [
