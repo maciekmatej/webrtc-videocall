@@ -4,7 +4,7 @@
   "main": "/server.ts",
   "scripts": {
     "devStart": "npx tsx watch ./src/server.ts",
-    "build": "NODE_ENV=production tsc",
+    "build": "tsc",
     "clean": "rm -rf dist rm -rf tsconfig.tsbuildinfo"
   },
   "engines": {
