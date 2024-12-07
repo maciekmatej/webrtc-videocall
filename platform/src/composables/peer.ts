@@ -11,7 +11,7 @@ export const usePeer = () => {
       port: 9000,
       host: location.hostname,
       debug: 3,
-      secure: false,
+      secure: true,
       path: '/peer',
       config: {
         iceServers: [
