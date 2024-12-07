@@ -4,6 +4,7 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 import cors from 'cors';
+var fs = require('fs');
 import history from 'connect-history-api-fallback';
 import { ExpressPeerServer } from 'peer';
 import { Server, Socket } from 'socket.io';
@@ -26,13 +27,19 @@ const __dirname = path.resolve('../platform/dist');
 // app.use(expressPeerServer);
 //
 
+var sslOptions = {
+  key: fs.readFileSync('key.key'),
+  cert: fs.readFileSync('cert.pem'),
+};
 //peer server
 const peerPort = serverConfig.PEER_PORT as number;
 const peerServer = http.createServer(app);
+// const peerServerHttps = https.createServer(app);
 const expressPeerServer = ExpressPeerServer(peerServer, {
   //@ts-expect-error
   debug: true,
   path: '/',
+  ssl: sslOptions,
 });
 expressPeerServer.on('connection', function (client) {
   console.log(client.getId() + ' peer connected');
@@ -82,4 +89,4 @@ app.get('/api/*', (req: Request, res: Response) => {
 });
 
 server.listen(port, () => console.log(`Listening on: ${port}`));
-peerServer.listen(peerPort, () => console.log(`Listening on: ${peerPort}`));
+peerServer.listen(10000, () => console.log(`Listening on: ${peerPort}`));

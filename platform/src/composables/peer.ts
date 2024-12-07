@@ -8,7 +8,7 @@ export const usePeer = () => {
   console.log(location.hostname, 'hostname')
   const createNewPeer = () => {
     peer.value = new Peer(UUIDv4(), {
-      port: 9000,
+      port: 10000,
       host: location.hostname,
       debug: 3,
       secure: true,
