@@ -10,7 +10,10 @@ import IncomingCallDialog from '@/components/IncomingCallDialog.vue'
 import CreateRoom from '@/components/CreateRoom.vue'
 import { usePeer } from '@/composables/peer'
 import { onMounted } from 'vue'
-const { peer } = usePeer()
+const { peer, createNewPeer } = usePeer()
+onMounted(() => {
+  createNewPeer()
+})
 </script>
 
 <style scoped lang="sass"></style>

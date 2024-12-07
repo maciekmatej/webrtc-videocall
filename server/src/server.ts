@@ -62,20 +62,20 @@ app.use(
 const port = serverConfig.PORT as number;
 const server = http.createServer(app);
 
-const io = new Server(server, {
-  path: '/socket.io/',
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  },
-});
+// const io = new Server(server, {
+//   path: '/socket.io/',
+//   cors: {
+//     origin: '*',
+//     methods: ['GET', 'POST'],
+//   },
+// });
 
 // Listen for incoming connections
-io.on('connection', (socket: Socket) => {
-  // Log when a user connects
-  console.log('A user connected', socket.id);
-  roomHandler(socket, io); //pass socket for room creation
-});
+// io.on('connection', (socket: Socket) => {
+//   // Log when a user connects
+//   console.log('A user connected', socket.id);
+//   roomHandler(socket, io); //pass socket for room creation
+// });
 app.use(cors());
 app.use(express.static(__dirname));
 
