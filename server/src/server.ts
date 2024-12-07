@@ -39,7 +39,7 @@ const expressPeerServer = ExpressPeerServer(peerServer, {
   //@ts-expect-error
   debug: true,
   path: '/',
-  ssl: sslOptions,
+  // ssl: sslOptions,
 });
 expressPeerServer.on('connection', function (client) {
   console.log(client.getId() + ' peer connected');
