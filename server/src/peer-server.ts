@@ -88,5 +88,4 @@ app.get('/api/*', (req: Request, res: Response) => {
   res.send('API connected');
 });
 
-server.listen(port, () => console.log(`Listening on: ${port}`));
-peerServer.listen(10000, () => console.log(`Listening on: ${peerPort}`));
+peerServer.listen(9000, () => console.log(`Listening on: ${peerPort}`));
