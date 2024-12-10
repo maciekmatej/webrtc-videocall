@@ -8,10 +8,10 @@ export const usePeer = () => {
   console.log(location.hostname, 'hostname')
   const createNewPeer = () => {
     peer.value = new Peer(UUIDv4(), {
-      port: 10000,
+      port: 9000,
       host: location.hostname,
       debug: 3,
-      secure: true,
+      secure: false,
       path: '/peer',
       config: {
         iceServers: [

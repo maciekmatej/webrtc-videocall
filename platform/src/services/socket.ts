@@ -15,7 +15,7 @@ export const state: Ref<{
 
 export const socket = io({ path: '/socket.io/' })
 socket.on('connect', () => {
-  // createNewPeer()
+  createNewPeer()
   state.value.socket = socket
   state.value.connected = true
 })

@@ -17,19 +17,21 @@
         </template>
       </Button>
       <div v-if="isLocalFeed">
-        <Button @click="toggleMute('video')">
-          <template v-if="isVideoMuted">
-            <IconCamOff />
-          </template>
-          <template v-else>
-            <IconCamOn />
-          </template>
-        </Button>
-        <Button @click="hangupCall">
-          <template>
+        <div>
+          <Button @click="toggleMute('video')">
+            <template v-if="isVideoMuted">
+              <IconCamOff />
+            </template>
+            <template v-else>
+              <IconCamOn />
+            </template>
+          </Button>
+        </div>
+        <div>
+          <Button @click="hangupCall">
             <IconHangup />
-          </template>
-        </Button>
+          </Button>
+        </div>
       </div>
     </div>
   </div>
@@ -43,6 +45,8 @@ import IconCamOn from './icons/IconCamOn.vue'
 import IconMicOff from './icons/IconMicOff.vue'
 import IconMicOn from './icons/IconMicOn.vue'
 import IconHangup from './icons/IconHangup.vue'
+
+const emits = defineEmits(['hangup'])
 const props = defineProps<{
   stream?: MediaStream
   isLocalFeed: boolean
@@ -60,7 +64,7 @@ watchEffect(() => {
 })
 
 const hangupCall = () => {
-  console.log('hangup')
+  emits('hangup')
 }
 const toggleMute = (type: 'audio' | 'video') => {
   if (props.stream) {

@@ -2,7 +2,7 @@ import axios from 'axios'
 // import { useAuthentication } from '../composables/useAuthentication';
 
 const API = axios.create({
-  baseURL: 'https://webrtc-videocall-p7ji.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_URL,
   headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
   timeout: 10000,
 })

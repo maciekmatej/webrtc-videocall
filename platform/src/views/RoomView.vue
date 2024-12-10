@@ -2,7 +2,7 @@
   <div class="flex justify-center items-center relative h-full">
     <h1>{{ $route.params.roomId }}</h1>
     <div :class="{ 'absolute bottom-1 right-1': store.participantsListWithoutUser.length > 0 }">
-      <UserFeedPlayer :stream="localStream" :is-local-feed="true" />
+      <UserFeedPlayer :stream="localStream" :is-local-feed="true" @hangup="handleHangup" />
     </div>
     <div v-for="(data, user) in remoteStreams" :key="user">
       <h1>{{ user }}</h1>
@@ -85,6 +85,12 @@ onBeforeUnmount(() => {
     socket.emit('leave-room', { roomId: roomId.value, peerId: peer.value.id })
   }
 })
+const handleHangup = () => {
+  if (peer.value) {
+    console.log(roomId.value, 'room from route')
+    socket.emit('leave-room', { roomId: roomId.value, peerId: peer.value.id })
+  }
+}
 watchEffect(() => {
   if (!peer.value || !localStream.value) {
     // socket.off('user-joined-room')

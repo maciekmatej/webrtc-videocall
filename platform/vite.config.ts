@@ -12,6 +12,14 @@ export default defineConfig({
     postcss: {
       plugins: [tailwind(), autoprefixer()],
     },
+    preprocessorOptions: {
+      sass: {
+        api: 'modern-compiler', // or "modern", "legacy"
+        importers: [
+          // ...
+        ],
+      },
+    }
   },
   resolve: {
     alias: {

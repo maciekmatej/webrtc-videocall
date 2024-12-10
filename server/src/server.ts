@@ -27,10 +27,6 @@ const __dirname = path.resolve('../platform/dist');
 // app.use(expressPeerServer);
 //
 
-var sslOptions = {
-  key: fs.readFileSync('key.key'),
-  cert: fs.readFileSync('cert.pem'),
-};
 //peer server
 const peerPort = serverConfig.PEER_PORT as number;
 const peerServer = http.createServer(app);
@@ -84,9 +80,13 @@ io.on('connection', (socket: Socket) => {
 app.use(cors());
 app.use(express.static(__dirname));
 
-app.get('/api/*', (req: Request, res: Response) => {
+app.get('/api/test', (req: Request, res: Response) => {
   res.send('API connected');
+});
+app.get('/api/verifyCardNumber', (req: Request, res: Response) => {
+  console.log('params', req.query.card_no, req.query.pin_no)
+  res.send(req.params);
 });
 
 server.listen(port, () => console.log(`Listening on: ${port}`));
-peerServer.listen(10000, () => console.log(`Listening on: ${peerPort}`));
+peerServer.listen(9000, () => console.log(`Listening on: ${peerPort}`));
