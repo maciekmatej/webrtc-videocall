@@ -21,14 +21,14 @@ export const useAuthStore = defineStore('auth', () => {
         card_no: cardNumber,
         pin_no: pinNumber,
       }
-      isCardVerified.value = (await API.get('/api/verifyCardNumber', { params })).data
+      isCardVerified.value = (await API.get('/verifyCardNumber', { params })).data
       if (isCardVerified.value) {
         loggedCardNumber.value = cardNumber
       }
     } catch {
       isCardVerified.value = false
     } finally {
-        isLoadingVerification.value = false
+      isLoadingVerification.value = false
     }
   }
   if (import.meta.hot) {

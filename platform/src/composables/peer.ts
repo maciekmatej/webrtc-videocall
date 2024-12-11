@@ -10,7 +10,7 @@ export const usePeer = () => {
     peer.value = new Peer(UUIDv4(), {
       port: 9000,
       host: location.hostname,
-      debug: 3,
+      debug: 1,
       secure: false,
       path: '/peer',
       config: {
