@@ -5,7 +5,8 @@ import https from 'https';
 import path from 'path';
 import cors from 'cors';
 import fs from 'fs';
-import * as db from './config/db';
+import globalRoute from './routes/globalEnvironment';
+import numberRoute from './routes/numbers';
 import history from 'connect-history-api-fallback';
 import { ExpressPeerServer } from 'peer';
 import { Server, Socket } from 'socket.io';
@@ -78,24 +79,14 @@ io.on('connection', (socket: Socket) => {
   console.log('A user connected', socket.id);
   roomHandler(socket, io); //pass socket for room creation
 });
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use(express.static(__dirname));
-
+app.use('/api', numberRoute);
+app.use('/api', globalRoute);
 app.get('/api/test', (req: Request, res: Response) => {
   res.send('API connected');
-});
-app.get('/api/verifyCardNumber', async (req: Request, res: Response) => {
-  try {
-    const query = {
-      text: 'SELECT * FROM system_whitephone.card_pin WHERE card_no = $1 AND pin_no = $2',
-      values: [req.query.card_no, req.query.pin_no],
-    };
-    const { rows } = await db.query(query.text, query.values);
-    const isVerified = rows[0] ? true : false;
-    return res.status(200).send(isVerified);
-  } catch (error) {
-    return res.status(500).send(error);
-  }
 });
 
 server.listen(port, () => console.log(`Listening on: ${port}`));

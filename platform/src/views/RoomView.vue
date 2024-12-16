@@ -174,7 +174,6 @@ watchEffect(() => {
       ...remoteStreams.value,
       [peerId]: { stream: undefined, call: undefined, isAudioMuted: true, isVideoMuted: true },
     }
-    console.log(remoteStreams.value[peerId], 'przed')
     call.on('stream', (stream) => {
       console.log('stream z eventu ja dzwonilem', stream)
       addRemoteFeed(peerId, {
@@ -183,7 +182,6 @@ watchEffect(() => {
         isAudioMuted: !stream.getAudioTracks()[0]?.enabled,
         isVideoMuted: !stream.getVideoTracks()[0]?.enabled,
       })
-      console.log(remoteStreams.value[peerId], 'po streamie')
     })
     call.on('close', () => {
       removeRemoteFeed(peerId)
@@ -192,6 +190,24 @@ watchEffect(() => {
   socket.on('user-left-room', ({ peerId }: { peerId: string }) => {
     removeRemoteFeed(peerId)
   })
+  socket.on(
+    'user-muted',
+    ({ peerId, type, value }: { peerId: string; type: string; value: boolean }) => {
+      if (remoteStreams.value[peerId]) {
+        switch (type) {
+          case 'audio':
+            remoteStreams.value[peerId].isAudioMuted = value
+            break
+          case 'video':
+            remoteStreams.value[peerId].isVideoMuted = value
+            break
+
+          default:
+            break
+        }
+      }
+    },
+  )
 
   peer.value.on('call', (call) => {
     console.log('receiving a call from room')

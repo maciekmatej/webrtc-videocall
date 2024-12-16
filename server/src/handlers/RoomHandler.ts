@@ -24,6 +24,12 @@ const roomHandler = (socket: Socket, io: Server) => {
     });
     socket.on('disconnect', () => leaveRoom({ roomId, peerId }));
     io.in(roomId).emit('get-users', { roomId, users: rooms[roomId] });
+
+    socket.on(
+      'mute',
+      ({ type, value }: { type: 'audio' | 'video'; value: boolean }) =>
+        socket.to(roomId).emit('user-muted', { peerId, type, value })
+    );
   };
   const leaveRoom = ({ roomId, peerId }: IRoomParams) => {
     if (rooms[roomId]) {

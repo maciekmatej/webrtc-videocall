@@ -37,6 +37,7 @@ import IconMicOn from './icons/IconMicOn.vue'
 import IconHangup from './icons/IconHangup.vue'
 import { useStream } from '@/composables/stream'
 import type { Stream } from '@/types/StreamTypes'
+import { socket } from '@/services/socket'
 
 const { localStream } = useStream()
 const emits = defineEmits(['hangup'])
@@ -63,6 +64,7 @@ const toggleMute = (type: 'audio' | 'video') => {
         if (props.stream.getAudioTracks()[0]) {
           props.stream.getAudioTracks()[0].enabled = localStream.value.isAudioMuted
           localStream.value.isAudioMuted = !localStream.value.isAudioMuted
+          socket.emit('mute', { type, value: localStream.value.isAudioMuted })
         } else {
           console.log('brak mini majka')
         }
@@ -71,6 +73,7 @@ const toggleMute = (type: 'audio' | 'video') => {
         if (props.stream.getVideoTracks()[0]) {
           props.stream.getVideoTracks()[0].enabled = localStream.value.isVideoMuted
           localStream.value.isVideoMuted = !localStream.value.isVideoMuted
+          socket.emit('mute', { type, value: localStream.value.isVideoMuted })
         } else {
           console.log('brak kamerki')
         }

@@ -17,7 +17,7 @@
       ref="videoElRef"
       class="border-zinc-400 border rounded-md relative"
       :style="{ width: '100%', height: '100%' }"
-      :muted="isLocalFeed"
+      :muted
       autoplay
     ></video>
   </div>
@@ -34,7 +34,7 @@ import type { Stream } from '@/types/StreamTypes'
 
 const emits = defineEmits(['hangup'])
 const props = defineProps<{
-  isLocalFeed?: boolean
+  muted?: boolean
   userStream: Stream
 }>()
 const videoElRef = ref<HTMLVideoElement>()
