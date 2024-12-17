@@ -40,13 +40,18 @@ export const useStream = () => {
             exact: cameraFacing.value === 'user' ? 'environment' : 'user',
           },
         },
+        audio: true,
       })
       .then((stream) => {
+        localStream.value.stream = stream
         cameraFacing.value = cameraFacing.value === 'user' ? 'environment' : 'user'
         Object.values(remoteStreams.value).forEach((remoteStream) => {
           remoteStream.call?.peerConnection.getSenders().forEach((sender) => {
             if (sender?.track?.kind === 'video' && stream.getVideoTracks().length > 0) {
               sender.replaceTrack(stream.getVideoTracks()[0])
+            }
+            if (sender?.track?.kind === 'audio' && stream.getAudioTracks().length > 0) {
+              sender.replaceTrack(stream.getAudioTracks()[0])
             }
           })
         })

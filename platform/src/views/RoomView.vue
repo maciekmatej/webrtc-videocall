@@ -160,79 +160,88 @@ const handleHangup = () => {
     socket.emit('leave-room', { roomId: roomId.value, peerId: peer.value.id })
   }
 }
-watchEffect(() => {
-  if (!peer.value || !localStream.value.stream) {
-    // socket.off('user-joined-room')
-    return
-  }
-  console.log('watch efekt')
-  socket.on('user-joined-room', ({ peerId }: { peerId: string }) => {
-    //@ts-expect-error wrong type for peerjs otption
-    const call = peer.value!.call(peerId, localStream.value.stream, options)
-    console.log('call new peer that joined the room', peerId)
-    remoteStreams.value = {
-      ...remoteStreams.value,
-      [peerId]: { stream: undefined, call: undefined, isAudioMuted: true, isVideoMuted: true },
+watch(
+  () => [peer.value, localStream.value.stream],
+  ([newPeer, newStream], [oldPeer, oldStream]) => {
+    console.log([newPeer, newStream], [oldPeer, oldStream])
+    if (!peer.value || !localStream.value.stream) {
+      // socket.off('user-joined-room')
+      return
     }
-    call.on('stream', (stream) => {
-      console.log('stream z eventu ja dzwonilem', stream)
-      addRemoteFeed(peerId, {
-        stream,
-        call,
-        isAudioMuted: !stream.getAudioTracks()[0]?.enabled,
-        isVideoMuted: !stream.getVideoTracks()[0]?.enabled,
+    // check if stream already existed. True means it's input switch, no action needed
+    if (oldStream?.id) {
+      return
+    }
+    console.log(peer.value, localStream.value.stream)
+    console.log('watch efekt')
+    socket.on('user-joined-room', ({ peerId }: { peerId: string }) => {
+      //@ts-expect-error wrong type for peerjs otption
+      const call = peer.value!.call(peerId, localStream.value.stream, options)
+      console.log('call new peer that joined the room', peerId)
+      remoteStreams.value = {
+        ...remoteStreams.value,
+        [peerId]: { stream: undefined, call: undefined, isAudioMuted: true, isVideoMuted: true },
+      }
+      call.on('stream', (stream) => {
+        console.log('stream z eventu ja dzwonilem', stream)
+        addRemoteFeed(peerId, {
+          stream,
+          call,
+          isAudioMuted: !stream.getAudioTracks()[0]?.enabled,
+          isVideoMuted: !stream.getVideoTracks()[0]?.enabled,
+        })
+      })
+      call.on('close', () => {
+        removeRemoteFeed(peerId)
       })
     })
-    call.on('close', () => {
+    socket.on('user-left-room', ({ peerId }: { peerId: string }) => {
       removeRemoteFeed(peerId)
     })
-  })
-  socket.on('user-left-room', ({ peerId }: { peerId: string }) => {
-    removeRemoteFeed(peerId)
-  })
-  socket.on(
-    'user-muted',
-    ({ peerId, type, value }: { peerId: string; type: string; value: boolean }) => {
-      if (remoteStreams.value[peerId]) {
-        switch (type) {
-          case 'audio':
-            remoteStreams.value[peerId].isAudioMuted = value
-            break
-          case 'video':
-            remoteStreams.value[peerId].isVideoMuted = value
-            break
+    socket.on(
+      'user-muted',
+      ({ peerId, type, value }: { peerId: string; type: string; value: boolean }) => {
+        if (remoteStreams.value[peerId]) {
+          switch (type) {
+            case 'audio':
+              remoteStreams.value[peerId].isAudioMuted = value
+              break
+            case 'video':
+              remoteStreams.value[peerId].isVideoMuted = value
+              break
 
-          default:
-            break
+            default:
+              break
+          }
         }
-      }
-    },
-  )
+      },
+    )
 
-  peer.value.on('call', (call) => {
-    console.log('receiving a call from room')
-    call.answer(localStream.value.stream)
-    remoteStreams.value = {
-      ...remoteStreams.value,
-      [call.peer]: { stream: undefined, call: undefined, isAudioMuted: true, isVideoMuted: true },
-    }
-    call.on('stream', (stream) => {
-      console.log(
-        'stream z eventu on call',
-        stream,
-        !stream.getAudioTracks()[0]?.enabled,
-        !stream.getVideoTracks()[0]?.enabled,
-      )
-      addRemoteFeed(call.peer, {
-        stream,
-        call,
-        isAudioMuted: !stream.getAudioTracks()[0]?.enabled,
-        isVideoMuted: !stream.getVideoTracks()[0]?.enabled,
+    peer.value.on('call', (call) => {
+      console.log('receiving a call from room')
+      call.answer(localStream.value.stream)
+      remoteStreams.value = {
+        ...remoteStreams.value,
+        [call.peer]: { stream: undefined, call: undefined, isAudioMuted: true, isVideoMuted: true },
+      }
+      call.on('stream', (stream) => {
+        console.log(
+          'stream z eventu on call',
+          stream,
+          !stream.getAudioTracks()[0]?.enabled,
+          !stream.getVideoTracks()[0]?.enabled,
+        )
+        addRemoteFeed(call.peer, {
+          stream,
+          call,
+          isAudioMuted: !stream.getAudioTracks()[0]?.enabled,
+          isVideoMuted: !stream.getVideoTracks()[0]?.enabled,
+        })
       })
     })
-  })
-  socket.emit('ready')
-})
+    socket.emit('ready')
+  },
+)
 </script>
 <style lang="sass">
 .draggable
