@@ -14,7 +14,7 @@ const createRoom = () => {
   socket.emit('create-room')
 }
 socket.on('room-created', async (params) => {
-  await sendSms('516588149', params.roomId)
+  // await sendSms('516588149', params.roomId)
   router.push({ name: 'room', params: { roomId: params.roomId } })
 })
 </script>

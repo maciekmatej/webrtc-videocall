@@ -4,6 +4,6 @@ import { sendSmsImmediately } from '../controllers/sms';
 const router = express.Router();
 
 router.get('/verifyCardNumber', verifyCardNumber);
-router.post('/sendSms', sendSmsImmediately);
+// router.post('/sendSms', sendSmsImmediately);
 
 export default router;

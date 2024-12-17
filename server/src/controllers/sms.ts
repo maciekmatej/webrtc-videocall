@@ -14,9 +14,9 @@ export const sendSmsImmediately = asyncHandler(async (req, res, next) => {
     'Content-Type',
     'application/x-www-form-urlencoded;charset=UTF-8'
   );
-  myHeaders.append('Authorization', `${env.sms_microservice_public_key}`);
-  myHeaders.append('UrlAccess', `${env.sms_microservice_url_access}`);
-  const url = new URL(`${env.sms_microservice_url}sendSmsImmediately`);
+  // myHeaders.append('Authorization', `${env.sms_microservice_public_key}`);
+  // myHeaders.append('UrlAccess', `${env.sms_microservice_url_access}`);
+  // const url = new URL(`${env.sms_microservice_url}sendSmsImmediately`);
   const params = {
     gateway: '97a55371-6284-40df-b438-f5aa47850a66',
     content,
@@ -29,8 +29,8 @@ export const sendSmsImmediately = asyncHandler(async (req, res, next) => {
     body: new URLSearchParams(params),
   };
 
-  const response = await fetch(url, options);
-  const result = await response.json();
+  // const response = await fetch(url, options);
+  // const result = await response.json();
 
-  res.send(result);
+  // res.send(result);
 });

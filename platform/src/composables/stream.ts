@@ -69,7 +69,6 @@ export const useStream = () => {
       })
   }
   const addRemoteFeed = (user: string, feed: Stream) => {
-    removeRemoteFeed(user)
     remoteStreams.value = {
       ...remoteStreams.value,
       [user]: feed,
