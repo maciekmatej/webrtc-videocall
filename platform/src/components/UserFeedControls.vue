@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="absolute bottom-0 left-0 right-0 flex justify-around bg-zinc-800 p-2">
+  <div class="UserFeedControls">
+    <div class="flex justify-around bg-zinc-800 p-2">
       <div class="flex gap-1">
         <Button @click="toggleMute('audio')" :class="{ 'bg-blue-500': localStream.isAudioMuted }">
           <template v-if="localStream.isAudioMuted">

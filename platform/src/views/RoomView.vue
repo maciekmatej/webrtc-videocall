@@ -1,25 +1,34 @@
 <template>
-  <div class="flex justify-center items-center relative h-full flex-col">
-    <h1>{{ $route.params.roomId }}</h1>
-    <div v-for="(data, user) in remoteStreams" :key="user">
-      <h1>{{ user }}</h1>
-      <UserFeedPlayer :user-stream="data" />
+  <div class="RoomView h-full flex flex-col">
+    <div class="video-grid flex flex-1 w-full p-5 gap-5 flex-wrap content-normal justify-center">
+      <div
+        v-for="(data, user) in remoteStreams"
+        :key="user"
+        class="shadow-md max-w-[100%] rounded-lg relative video-container flex-shrink flex-grow basis-[300px] overflow-hidden"
+      >
+        <h1>{{ user }}</h1>
+        <UserFeedPlayer :user-stream="data" />
+      </div>
+      <div
+        v-if="store.participantsListWithoutUser.length > 0"
+        ref="draggableVideo"
+        :style="computedStyle"
+        class="draggable z-50 rounded-lg overflow-hidden border-blue-800 border-2"
+        :class="{ 'draggable--move': isAutoAlignElement }"
+      >
+        <UserFeedPlayer :user-stream="localStream" muted />
+      </div>
+      <div v-else class="relative">
+        <UserFeedPlayer :user-stream="localStream" muted />
+        <UserFeedControls :stream="localStream.stream" />
+      </div>
     </div>
-    <div
+    <UserFeedControls
+      class="w-full"
       v-if="store.participantsListWithoutUser.length > 0"
-      ref="draggableVideo"
-      :style="computedStyle"
-      style="position: fixed"
-      class="draggable"
-      :class="{ 'draggable--move': isAutoAlignElement }"
-    >
-      <UserFeedPlayer :user-stream="localStream" muted @hangup="handleHangup" />
-    </div>
-    <div v-else>
-      <UserFeedPlayer :user-stream="localStream" muted @hangup="handleHangup" />
-    </div>
-    <div>inbound {{ viedeoElementIsVisible }}</div>
-    <UserFeedControls :stream="localStream.stream" />
+      :stream="localStream.stream"
+      @hangup="handleHangup"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -138,7 +147,6 @@ async function getLocalStream() {
 
 onMounted(async () => {
   roomId.value = route.params.roomId as string
-  await getPluggedDevices()
   await getLocalStream()
 })
 watchEffect(() => {
@@ -156,8 +164,10 @@ onBeforeUnmount(() => {
 })
 const handleHangup = () => {
   if (peer.value) {
-    console.log(roomId.value, 'room from route')
+    console.log(roomId.value, 'handle hangup')
     socket.emit('leave-room', { roomId: roomId.value, peerId: peer.value.id })
+    Object.values(remoteStreams.value).forEach((remoteStream) => remoteStream.call?.close())
+    remoteStreams.value = {}
   }
 }
 watch(
@@ -192,6 +202,7 @@ watch(
         })
       })
       call.on('close', () => {
+        console.log('CLOSE EVENTU mimo ze ja dzwonil heheh')
         removeRemoteFeed(peerId)
       })
     })
@@ -238,6 +249,9 @@ watch(
           isVideoMuted: !stream.getVideoTracks()[0]?.enabled,
         })
       })
+      call.on('close', () => {
+        console.log('CLOSE EVENT do mnie dzwonili')
+      })
     })
     socket.emit('ready')
   },
@@ -245,6 +259,7 @@ watch(
 </script>
 <style lang="sass">
 .draggable
+  position: fixed
   left: var(--left)
   top: var(--top)
   width: 300px
@@ -256,4 +271,13 @@ watch(
     min-height: 100vh
     display: flex
     align-items: center
+
+@keyframes show
+  0%
+    opacity: 0
+    transform: scale(0.4) translateY(20px)
+
+  100%
+    opacity: 1
+    transform: scale(1) translateY(0)
 </style>
