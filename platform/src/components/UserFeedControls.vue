@@ -2,7 +2,7 @@
   <div>
     <div class="absolute bottom-0 left-0 right-0 flex justify-around bg-zinc-800 p-2">
       <div class="flex gap-1">
-        <Button @click="toggleMute('audio')" :class="{ 'bg-orange-500': localStream.isAudioMuted }">
+        <Button @click="toggleMute('audio')" :class="{ 'bg-blue-500': localStream.isAudioMuted }">
           <template v-if="localStream.isAudioMuted">
             <IconMicOff />
           </template>
@@ -11,7 +11,7 @@
           </template>
         </Button>
 
-        <Button @click="toggleMute('video')" :class="{ 'bg-orange-500': localStream.isVideoMuted }">
+        <Button @click="toggleMute('video')" :class="{ 'bg-blue-500': localStream.isVideoMuted }">
           <template v-if="localStream.isVideoMuted">
             <IconCamOff />
           </template>
@@ -20,6 +20,9 @@
           </template>
         </Button>
 
+        <Button @click="switchCamera" class="bg-blue-700">
+          <IconSwitchCamera />
+        </Button>
         <Button @click="hangupCall" class="bg-red-700">
           <IconHangup />
         </Button>
@@ -38,8 +41,9 @@ import IconHangup from './icons/IconHangup.vue'
 import { useStream } from '@/composables/stream'
 import type { Stream } from '@/types/StreamTypes'
 import { socket } from '@/services/socket'
+import IconSwitchCamera from './icons/IconSwitchCamera.vue'
 
-const { localStream } = useStream()
+const { localStream, switchCamera } = useStream()
 const emits = defineEmits(['hangup'])
 const props = defineProps<{
   stream?: MediaStream

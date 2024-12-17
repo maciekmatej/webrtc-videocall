@@ -1,10 +1,11 @@
-import type { Stream } from '@/types/StreamTypes'
+import type { CameraFacing, Stream } from '@/types/StreamTypes'
 import { ref, type Ref } from 'vue'
 
 const localStream: Ref<Stream> = ref({
   isAudioMuted: true,
   isVideoMuted: true,
 })
+const cameraFacing = ref<CameraFacing>('user')
 
 const remoteStreams = ref<Record<string, Stream>>({})
 const options = {
@@ -30,6 +31,29 @@ export const useStream = () => {
       audio,
       video,
     }
+  }
+  const switchCamera = async () => {
+    navigator.mediaDevices
+      .getUserMedia({
+        video: {
+          facingMode: {
+            exact: cameraFacing.value === 'user' ? 'environment' : 'user',
+          },
+        },
+      })
+      .then((stream) => {
+        cameraFacing.value = cameraFacing.value === 'user' ? 'environment' : 'user'
+        Object.values(remoteStreams.value).forEach((remoteStream) => {
+          remoteStream.call?.peerConnection.getSenders().forEach((sender) => {
+            if (sender?.track?.kind === 'video' && stream.getVideoTracks().length > 0) {
+              sender.replaceTrack(stream.getVideoTracks()[0])
+            }
+          })
+        })
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
   const getUserFeed = async () => {
     navigator.mediaDevices
@@ -70,5 +94,6 @@ export const useStream = () => {
     options,
     addRemoteFeed,
     removeRemoteFeed,
+    switchCamera,
   }
 }

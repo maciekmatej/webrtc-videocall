@@ -6,3 +6,5 @@ export interface Stream {
   isAudioMuted: boolean
   isVideoMuted: boolean
 }
+
+export type CameraFacing = 'user' | 'environment'
