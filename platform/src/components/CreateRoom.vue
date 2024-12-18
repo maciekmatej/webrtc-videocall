@@ -1,5 +1,5 @@
 <template>
-  <Button @click="createRoom">Start new meeting</Button>
+  <Button @click="createRoom">Zadzwoń</Button>
 </template>
 
 <script setup lang="ts">

@@ -1,5 +1,9 @@
 <template>
   <div class="RoomView h-full flex flex-col">
+    <div class="h-10 flex justify-center items-center mt-5">
+      Użytkownik pod numerem {{ roomStore.recipient }} został powiadomiony o próbie połączenia,
+      prosze czekać
+    </div>
     <div class="video-grid flex flex-1 w-full p-5 gap-5 flex-wrap content-normal justify-center">
       <div
         v-for="(data, user) in remoteStreams"
@@ -10,7 +14,7 @@
         <UserFeedPlayer :user-stream="data" />
       </div>
       <div
-        v-if="store.participantsListWithoutUser.length > 0"
+        v-if="roomStore.participantsListWithoutUser.length > 0"
         ref="draggableVideo"
         :style="computedStyle"
         class="draggable z-50 rounded-lg overflow-hidden border-blue-800 border-2"
@@ -18,17 +22,14 @@
       >
         <UserFeedPlayer :user-stream="localStream" muted />
       </div>
-      <div v-else class="relative">
+      <div
+        v-else
+        class="shadow-md max-w-[100%] rounded-lg relative video-container flex-shrink flex-grow basis-[300px] overflow-hidden"
+      >
         <UserFeedPlayer :user-stream="localStream" muted />
-        <UserFeedControls :stream="localStream.stream" />
       </div>
     </div>
-    <UserFeedControls
-      class="w-full"
-      v-if="store.participantsListWithoutUser.length > 0"
-      :stream="localStream.stream"
-      @hangup="handleHangup"
-    />
+    <UserFeedControls class="w-full" :stream="localStream.stream" @hangup="handleHangup" />
   </div>
 </template>
 <script setup lang="ts">
@@ -48,14 +49,17 @@ import {
   watch,
   watchEffect,
 } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useStream } from '@/composables/stream'
 import UserFeedControls from '@/components/UserFeedControls.vue'
 import { useDraggable, useElementBounding } from '@vueuse/core'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const router = useRouter()
 const { peer } = usePeer()
-const store = useRoomStore()
+const roomStore = useRoomStore()
+const authStore = useAuthStore()
 const {
   getUserFeed,
   getPluggedDevices,
@@ -64,6 +68,8 @@ const {
   options,
   addRemoteFeed,
   removeRemoteFeed,
+  removeAllRemoteFeed,
+  removeLocalFeed,
 } = useStream()
 const roomId = ref('')
 onBeforeMount(() => {
@@ -118,7 +124,7 @@ const moveVideoToNearestCorner = async () => {
   isAutoAlignElement.value = false
 }
 const fetchRoomParticipantsList = ({ roomId, users }: { roomId: string; users: string[] }) => {
-  store.participantsList = users
+  roomStore.participantsList = users
 }
 async function getLocalStream() {
   await getPluggedDevices()
@@ -159,15 +165,26 @@ watchEffect(() => {
 onBeforeUnmount(() => {
   if (peer.value) {
     console.log(roomId.value, 'room from route')
-    socket.emit('leave-room', { roomId: roomId.value, peerId: peer.value.id })
+
+    // prepared for group calls
+
+    // socket.emit('leave-room', { roomId: roomId.value, peerId: peer.value.id })
+
+    //clear all streams
+    localStream.value.stream?.getTracks().forEach((track) => track.stop())
+    Object.values(remoteStreams.value).forEach((remoteStream) => remoteStream.call?.close())
+    remoteStreams.value = {}
   }
 })
 const handleHangup = () => {
   if (peer.value) {
-    console.log(roomId.value, 'handle hangup')
-    socket.emit('leave-room', { roomId: roomId.value, peerId: peer.value.id })
-    Object.values(remoteStreams.value).forEach((remoteStream) => remoteStream.call?.close())
-    remoteStreams.value = {}
+    // prepared for group calls
+
+    // console.log(roomId.value, 'handle hangup')
+    // socket.emit('leave-room', { roomId: roomId.value, peerId: peer.value.id })
+
+    socket.emit('close-room', { roomId: roomId.value, peerId: peer.value.id })
+    closePeerConections()
   }
 }
 watch(
@@ -202,13 +219,16 @@ watch(
         })
       })
       call.on('close', () => {
-        console.log('CLOSE EVENTU mimo ze ja dzwonil heheh')
-        removeRemoteFeed(peerId)
+        // removeRemoteFeed(peerId)
+        clearStreams()
+        leaveCallView()
       })
     })
-    socket.on('user-left-room', ({ peerId }: { peerId: string }) => {
-      removeRemoteFeed(peerId)
-    })
+    //prepare for group calls
+
+    // socket.on('user-left-room', ({ peerId }: { peerId: string }) => {
+    //   removeRemoteFeed(peerId)
+    // })
     socket.on(
       'user-muted',
       ({ peerId, type, value }: { peerId: string; type: string; value: boolean }) => {
@@ -250,12 +270,31 @@ watch(
         })
       })
       call.on('close', () => {
+        clearStreams()
         console.log('CLOSE EVENT do mnie dzwonili')
+        leaveCallView()
       })
     })
     socket.emit('ready')
   },
 )
+
+const leaveCallView = () => {
+  if (authStore.isCardVerified) {
+    router.push({ name: 'home' })
+  } else {
+    router.push({ name: 'callend' })
+  }
+}
+const closePeerConections = () => {
+  Object.values(remoteStreams.value).forEach((remoteStream) => remoteStream.call?.close())
+}
+
+const clearStreams = () => {
+  removeLocalFeed()
+  removeAllRemoteFeed()
+  remoteStreams.value = {}
+}
 </script>
 <style lang="sass">
 .draggable

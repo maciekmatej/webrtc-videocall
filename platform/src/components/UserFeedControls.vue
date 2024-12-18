@@ -1,8 +1,15 @@
 <template>
   <div class="UserFeedControls">
     <div class="flex justify-around bg-zinc-800 p-2">
-      <div class="flex gap-1">
-        <Button @click="toggleMute('audio')" :class="{ 'bg-blue-500': localStream.isAudioMuted }">
+      <div class="flex gap-2">
+        <Button
+          class="rounded-lg"
+          @click="toggleMute('audio')"
+          :class="{
+            'bg-blue-600': !localStream.isAudioMuted,
+            'bg-red-500': localStream.isAudioMuted,
+          }"
+        >
           <template v-if="localStream.isAudioMuted">
             <IconMicOff />
           </template>
@@ -11,7 +18,14 @@
           </template>
         </Button>
 
-        <Button @click="toggleMute('video')" :class="{ 'bg-blue-500': localStream.isVideoMuted }">
+        <Button
+          class="rounded-lg"
+          @click="toggleMute('video')"
+          :class="{
+            'bg-blue-600': localStream.isVideoMuted,
+            'bg-red-500': localStream.isVideoMuted,
+          }"
+        >
           <template v-if="localStream.isVideoMuted">
             <IconCamOff />
           </template>
@@ -20,10 +34,10 @@
           </template>
         </Button>
 
-        <Button @click="switchCamera" class="bg-blue-700">
+        <Button @click="switchCamera" class="bg-blue-600 rounded-lg">
           <IconSwitchCamera />
         </Button>
-        <Button @click="hangupCall" class="bg-red-700">
+        <Button @click="hangupCall" class="bg-red-700 rounded-lg">
           <IconHangup />
         </Button>
       </div>

@@ -73,6 +73,14 @@ export const useStream = () => {
         localStream.value.isVideoMuted = true
       })
   }
+  const removeLocalFeed = () => {
+    localStream.value.stream?.getTracks().forEach((track) => track.stop())
+    delete localStream.value.stream
+    localStream.value = {
+      isAudioMuted: constraints.value.audio,
+      isVideoMuted: constraints.value.video,
+    }
+  }
   const addRemoteFeed = (user: string, feed: Stream) => {
     remoteStreams.value = {
       ...remoteStreams.value,
@@ -90,6 +98,17 @@ export const useStream = () => {
     }
     delete remoteStreams.value[user]
   }
+  const removeAllRemoteFeed = () => {
+    Object.values(remoteStreams.value).forEach((remoteStream) => {
+      const tracks = remoteStream.stream?.getTracks()
+      if (tracks) {
+        tracks.forEach((track) => {
+          track.stop()
+        })
+      }
+    })
+    remoteStreams.value = {}
+  }
   return {
     getPluggedDevices,
     getUserFeed,
@@ -98,6 +117,8 @@ export const useStream = () => {
     options,
     addRemoteFeed,
     removeRemoteFeed,
+    removeLocalFeed,
+    removeAllRemoteFeed,
     switchCamera,
   }
 }

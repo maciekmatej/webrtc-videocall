@@ -14,11 +14,18 @@ const roomHandler = (socket: Socket, io: Server) => {
     socket.emit('room-created', { roomId });
   };
   const joinRoom = ({ roomId, peerId }: IRoomParams) => {
-    if (rooms[roomId]) {
-      console.log('New user joined the room', roomId, 'peer', peerId);
-      rooms[roomId].push(peerId);
-      socket.join(roomId);
+    if (!rooms[roomId]) {
+      console.log('Room deas not exist');
+      return;
     }
+    console.log(rooms[roomId], 'rum');
+    if (rooms[roomId].length >= 2) {
+      console.log('User is on call');
+      return;
+    }
+    console.log('New user joined the room', roomId, 'peer', peerId);
+    rooms[roomId].push(peerId);
+    socket.join(roomId);
     socket.on('ready', () => {
       socket.to(roomId).emit('user-joined-room', { peerId });
     });
@@ -35,13 +42,26 @@ const roomHandler = (socket: Socket, io: Server) => {
     if (rooms[roomId]) {
       rooms[roomId] = rooms[roomId].filter((peer) => peer !== peerId);
     }
+    if (rooms[roomId]?.length === 0) {
+      //set call as ended in db
+      delete rooms[roomId];
+    }
+    socket.to(roomId).emit('user-left-room', { peerId });
+    socket.to(roomId).emit('get-users', { roomId, users: rooms[roomId] });
     socket.leave(roomId);
-    io.in(roomId).emit('user-left-room', { peerId });
-    io.in(roomId).emit('get-users', { roomId, users: rooms[roomId] });
+  };
+  const closeRoom = ({ roomId, peerId }: IRoomParams) => {
+    if (rooms[roomId]) {
+      //set call as ended in db and remove room
+      console.log(peerId, 'call terminated');
+      delete rooms[roomId];
+    }
+    socket.leave(roomId);
   };
   socket.on('create-room', createRoom);
   socket.on('join-room', joinRoom);
   socket.on('leave-room', leaveRoom);
+  socket.on('close-room', closeRoom);
 };
 
 export default roomHandler;

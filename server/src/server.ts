@@ -7,6 +7,7 @@ import cors from 'cors';
 import fs from 'fs';
 import globalRoute from './routes/globalEnvironment';
 import numberRoute from './routes/numbers';
+import roomRoute from './routes/room';
 import history from 'connect-history-api-fallback';
 import { ExpressPeerServer } from 'peer';
 import { Server, Socket } from 'socket.io';
@@ -84,6 +85,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use(express.static(__dirname));
 app.use('/api', numberRoute);
+app.use('/api', roomRoute);
 app.use('/api', globalRoute);
 app.get('/api/test', (req: Request, res: Response) => {
   res.send('API connected');
